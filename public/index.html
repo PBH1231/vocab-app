@@ -3,166 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Học Từ Vựng - Flashcards</title>
+    <title>Hệ Thống Từ Vựng - Bảng Điều Khiển</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* CSS cho hiệu ứng lật thẻ 3D */
-        .perspective { perspective: 1000px; }
-        .preserve-3d { transform-style: preserve-3d; }
-        .backface-hidden { backface-visibility: hidden; }
-        .rotate-y-180 { transform: rotateY(180deg); }
-        .card-transition { transition: transform 0.4s ease-in-out; }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-50 flex flex-col items-center justify-center min-h-screen p-4">
+<body class="bg-gray-50 flex h-screen overflow-hidden text-gray-800">
 
-    <div id="loading" class="text-xl font-semibold text-gray-600 mb-4">Đang tải dữ liệu...</div>
-    <div id="progressCounter" class="text-sm font-bold text-blue-500 mb-4 hidden">Từ 1 / 3</div>
-
-    <div id="flashcardContainer" class="w-full max-w-sm w-[350px] h-[500px] perspective cursor-pointer hidden" onclick="flipCard()">
-        <div id="flashcard" class="relative w-full h-full preserve-3d card-transition shadow-2xl rounded-2xl">
-            
-            <div class="absolute w-full h-full backface-hidden bg-white rounded-2xl flex flex-col items-center justify-center p-6 border-t-4 border-blue-500">
-                <h2 id="word" class="text-4xl font-bold text-gray-800 mb-2"></h2>
-                <p id="phonetic" class="text-gray-500 text-lg mb-1"></p>
-                <span id="pos" class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold mb-6"></span>
-                
-                <button onclick="playAudio(event)" class="p-4 bg-gray-100 rounded-full hover:bg-gray-200 transition shadow-sm">
-                    <svg class="w-8 h-8 text-gray-700" fill="currentColor" viewBox="0 0 20 20"><path d="M10 3.5a.5.5 0 00-.5.5v12a.5.5 0 001 0V4a.5.5 0 00-.5-.5z"/><path fill-rule="evenodd" d="M10.707 3.293a1 1 0 010 1.414L6.414 9H3a1 1 0 00-1 1v4a1 1 0 001 1h3.414l4.293 4.293a1 1 0 001.707-.707V3.5a1 1 0 00-1.707-.707z" clip-rule="evenodd"/></svg>
-                </button>
+    <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 shadow-sm">
+        <div class="p-6 flex items-center space-x-3 border-b border-gray-100">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
+                V
             </div>
-
-            <div class="absolute w-full h-full backface-hidden bg-gray-50 rounded-2xl flex flex-col items-center justify-center p-6 rotate-y-180 border-t-4 border-green-500">
-                <h3 id="meaning" class="text-3xl font-bold text-gray-800 mb-6 text-center"></h3>
-                <div class="bg-white p-5 rounded-xl shadow-sm w-full mb-6 border border-gray-100">
-                    <p id="example" class="text-gray-700 italic mb-3 text-lg"></p>
-                    <p id="translation" class="text-gray-500 text-sm"></p>
+            <span class="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">VocabApp</span>
+        </div>
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+            <a href="#" class="flex items-center space-x-3 p-3 bg-blue-50 text-blue-600 rounded-xl font-medium transition">
+                <i class="fa-solid fa-house w-5"></i><span>Tổng quan</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-600 rounded-xl font-medium transition">
+                <i class="fa-solid fa-layer-group w-5"></i><span>Bộ từ vựng</span>
+            </a>
+            <a href="admin.html" class="flex items-center space-x-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-600 rounded-xl font-medium transition">
+                <i class="fa-solid fa-plus-circle w-5"></i><span>Thêm từ mới</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-600 rounded-xl font-medium transition">
+                <i class="fa-solid fa-chart-pie w-5"></i><span>Thống kê</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-gray-100">
+            <div class="flex items-center space-x-3 p-2">
+                <img src="https://ui-avatars.com/api/?name=Huy&background=random" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
+                <div>
+                    <p class="text-sm font-bold text-gray-700">Người dùng</p>
+                    <p class="text-xs text-gray-500">Học viên VIP</p>
                 </div>
-                <button onclick="markLearned(event)" class="mt-4 px-6 py-3 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 transition w-full shadow-md text-lg">
-                    Đã thuộc từ này
-                </button>
             </div>
         </div>
-    </div>
+    </aside>
 
-    <button id="nextBtn" onclick="nextCard()" class="mt-8 px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition hidden">
-        Chưa thuộc, Bỏ qua ->
-    </button>
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto pb-20 md:pb-0">
+        <header class="md:hidden bg-white p-4 border-b border-gray-200 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+            <span class="text-xl font-extrabold text-blue-600">VocabApp</span>
+            <img src="https://ui-avatars.com/api/?name=Huy&background=random" class="w-9 h-9 rounded-full shadow-sm">
+        </header>
 
-    <script>
-        let vocabList = [];
-        let currentIndex = 0;
-        let isFlipped = false;
+        <div class="p-4 md:p-8 max-w-5xl mx-auto w-full space-y-6 md:space-y-8">
+            
+            <div>
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">Chào mừng trở lại! 👋</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+                        <span class="text-gray-500 text-sm font-medium mb-1">Đã học</span>
+                        <span class="text-2xl font-bold text-blue-600">124 <span class="text-sm font-normal text-gray-400">từ</span></span>
+                    </div>
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+                        <span class="text-gray-500 text-sm font-medium mb-1">Cần ôn tập</span>
+                        <span class="text-2xl font-bold text-orange-500">18 <span class="text-sm font-normal text-gray-400">từ</span></span>
+                    </div>
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col hidden md:flex">
+                        <span class="text-gray-500 text-sm font-medium mb-1">Chuỗi ngày</span>
+                        <span class="text-2xl font-bold text-green-500">7 <span class="text-sm font-normal text-gray-400">ngày</span></span>
+                    </div>
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col hidden md:flex">
+                        <span class="text-gray-500 text-sm font-medium mb-1">Tiến độ tổng</span>
+                        <span class="text-2xl font-bold text-purple-600">68%</span>
+                    </div>
+                </div>
+            </div>
 
-        // Tự động chạy khi load trang
-        document.addEventListener("DOMContentLoaded", fetchVocab);
-
-        // 1. Gọi API lấy dữ liệu
-        async function fetchVocab() {
-            try {
-                const response = await fetch('https://vocab-api-9689.onrender.com/api/sets/1/flashcards?user_id=1');
-                const data = await response.json();
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">Tiếp tục ôn tập</h3>
+                    <a href="#" class="text-sm font-semibold text-blue-600 hover:underline">Xem tất cả</a>
+                </div>
                 
-                vocabList = data.words;
-                
-                if (vocabList.length > 0) {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('flashcardContainer').classList.remove('hidden');
-                    document.getElementById('progressCounter').classList.remove('hidden');
-                    document.getElementById('nextBtn').classList.remove('hidden');
-                    renderCard();
-                } else {
-                    document.getElementById('loading').innerText = "Không có từ vựng nào trong bộ này.";
-                }
-            } catch (error) {
-                console.error("Lỗi:", error);
-                document.getElementById('loading').innerText = "Lỗi kết nối máy chủ!";
-            }
-        }
+                <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden transition hover:shadow-lg">
+                    <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded">TOEIC</span>
+                                <span class="text-sm text-gray-500"><i class="fa-regular fa-clock"></i> Cập nhật hôm qua</span>
+                            </div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-1">Mục tiêu 600+ (Phần 1)</h4>
+                            <p class="text-sm text-gray-500 mb-4">Chứa các từ vựng cốt lõi thường xuất hiện trong Part 5 & 6.</p>
+                            
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 text-right font-medium">45/100 từ</p>
+                        </div>
+                        
+                        <div class="flex md:flex-col gap-2 w-full md:w-auto">
+                            <a href="learn.html" class="flex-1 text-center bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-md hover:bg-blue-700 transition">
+                                <i class="fa-solid fa-bolt mr-1"></i> Flashcard
+                            </a>
+                            <button class="flex-1 text-center bg-indigo-100 text-indigo-700 px-6 py-3 rounded-xl font-bold hover:bg-indigo-200 transition">
+                                <i class="fa-solid fa-gamepad mr-1"></i> Trắc nghiệm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        // 2. Render dữ liệu lên thẻ
-        function renderCard() {
-            if (currentIndex >= vocabList.length) {
-                document.getElementById('flashcardContainer').innerHTML = "<h2 class='text-2xl font-bold text-green-600 text-center mt-20'>Chúc mừng! Bạn đã ôn tập xong.</h2>";
-                document.getElementById('progressCounter').style.display = 'none';
-                document.getElementById('nextBtn').style.display = 'none';
-                return;
-            }
+        </div>
+    </main>
 
-            const currentWord = vocabList[currentIndex];
-            
-            // Cập nhật mặt trước
-            document.getElementById('word').innerText = currentWord.word;
-            document.getElementById('phonetic').innerText = currentWord.phonetic || '';
-            document.getElementById('pos').innerText = currentWord.part_of_speech || '';
-            
-            // Cập nhật mặt sau
-            document.getElementById('meaning').innerText = currentWord.meaning;
-            document.getElementById('example').innerText = `"${currentWord.example}"`;
-            document.getElementById('translation').innerText = currentWord.example_translation;
+    <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around items-center pb-safe z-50">
+        <a href="#" class="flex flex-col items-center py-3 px-4 text-blue-600">
+            <i class="fa-solid fa-house text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Trang chủ</span>
+        </a>
+        <a href="admin.html" class="flex flex-col items-center py-3 px-4 text-gray-400 hover:text-blue-600 transition">
+            <i class="fa-solid fa-plus-circle text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Thêm từ</span>
+        </a>
+        <a href="#" class="flex flex-col items-center py-3 px-4 text-gray-400 hover:text-blue-600 transition">
+            <i class="fa-solid fa-chart-pie text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Tiến độ</span>
+        </a>
+        <a href="#" class="flex flex-col items-center py-3 px-4 text-gray-400 hover:text-blue-600 transition">
+            <i class="fa-solid fa-user text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Hồ sơ</span>
+        </a>
+    </nav>
 
-            // Cập nhật bộ đếm
-            document.getElementById('progressCounter').innerText = `Từ ${currentIndex + 1} / ${vocabList.length}`;
-            
-            // Đảm bảo thẻ úp lại khi chuyển sang từ mới
-            isFlipped = false;
-            document.getElementById('flashcard').classList.remove('rotate-y-180');
-        }
-
-        // 3. Logic Lật thẻ
-        function flipCard() {
-            const card = document.getElementById('flashcard');
-            isFlipped = !isFlipped;
-            if(isFlipped) card.classList.add('rotate-y-180');
-            else card.classList.remove('rotate-y-180');
-        }
-
-        // 4. Logic Phát âm qua Free API
-        async function playAudio(event) {
-            event.stopPropagation(); // Ngăn lật thẻ khi bấm loa
-            const wordToPlay = vocabList[currentIndex].word;
-            try {
-                const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${wordToPlay}`);
-                const data = await response.json();
-                const audioUrl = data[0].phonetics.find(p => p.audio).audio;
-                
-                if(audioUrl) {
-                    new Audio(audioUrl).play();
-                } else {
-                    alert('Không tìm thấy file ghi âm cho từ này.');
-                }
-            } catch (error) {
-                console.error("Lỗi âm thanh:", error);
-            }
-        }
-
-        // 5. Logic Đã thuộc (Gửi API lưu tiến độ)
-        async function markLearned(event) {
-            event.stopPropagation(); // Ngăn lật thẻ lại
-            const currentWord = vocabList[currentIndex];
-            
-            try {
-                await fetch('https://vocab-api-9689.onrender.com/api/progress/update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        user_id: 1,
-                        vocab_id: currentWord.id,
-                        is_learned: true
-                    })
-                });
-                // Chuyển sang từ tiếp theo
-                nextCard();
-            } catch (error) {
-                alert("Lỗi lưu tiến độ!");
-            }
-        }
-
-        // 6. Logic Bỏ qua / Chuyển từ
-        function nextCard() {
-            currentIndex++;
-            renderCard();
-        }
-    </script>
 </body>
 </html>
