@@ -283,3 +283,21 @@ def delete_set(set_id: int, db: Session = Depends(get_db)):
     db.commit()
     
     return {"message": "Đã xóa bộ từ vựng thành công"}
+# =========================
+# API: THỐNG KÊ TIẾN ĐỘ HỌC
+# =========================
+
+@app.get("/api/progress/stats")
+def get_progress_stats(user_id: int = 1, db: Session = Depends(get_db)):
+    total_words = db.query(Vocabulary).count()
+    learned_words = db.query(UserProgress).filter(
+        UserProgress.user_id == user_id, 
+        UserProgress.is_learned == True
+    ).count()
+    need_review = total_words - learned_words
+    
+    return {
+        "total_words": total_words,
+        "learned_words": learned_words,
+        "need_review": need_review
+    }

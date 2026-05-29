@@ -40,23 +40,23 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
                         <span class="text-gray-500 text-sm">Đã học</span>
-                        <div class="text-2xl font-bold text-blue-600 mt-1">124 <span class="text-xs text-gray-400">từ</span></div>
+                        <div class="text-2xl font-bold text-blue-600 mt-1"><span id="dashLearned">...</span> <span class="text-xs text-gray-400">từ</span></div>
                     </div>
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
                         <span class="text-gray-500 text-sm">Cần ôn</span>
-                        <div class="text-2xl font-bold text-orange-500 mt-1">18 <span class="text-xs text-gray-400">từ</span></div>
+                        <div class="text-2xl font-bold text-orange-500 mt-1"><span id="dashNeedReview">...</span> <span class="text-xs text-gray-400">từ</span></div>
                     </div>
                 </div>
 
                 <h3 class="text-xl font-bold mb-4">Gợi ý học hôm nay</h3>
                 <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-5 flex flex-col md:flex-row justify-between md:items-center gap-4">
                     <div>
-                        <h4 class="text-lg font-bold text-gray-800">TOEIC Mục tiêu 600+</h4>
+                        <h4 class="text-lg font-bold text-gray-800">Tiếp tục hành trình</h4>
                         <p class="text-sm text-gray-500 mt-1">Ôn tập ngay để duy trì chuỗi ngày học tập.</p>
                     </div>
-                    <a href="learn.html?set_id=1" class="text-center bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow hover:bg-blue-700">
-                        Học ngay
-                    </a>
+                    <button onclick="switchTab('sets')" class="text-center bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow hover:bg-blue-700 transition">
+                        Đến Bộ từ vựng
+                    </button>
                 </div>
             </div>
 
@@ -91,7 +91,6 @@
                 <h3 class="text-xl font-bold text-gray-800">Tạo Bộ Từ Vựng Mới</h3>
                 <button onclick="toggleSetModal(false)" class="text-gray-400 hover:text-red-500 transition text-2xl">&times;</button>
             </div>
-            
             <form id="addSetForm" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tên bộ từ vựng *</label>
@@ -101,7 +100,6 @@
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mô tả chi tiết</label>
                     <textarea id="setDesc" rows="3" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
                 </div>
-
                 <div class="flex gap-3 pt-4 mt-4 border-t border-gray-100">
                     <button type="button" onclick="toggleSetModal(false)" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition">Bỏ qua</button>
                     <button type="submit" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition shadow-md">Tạo ngay</button>
@@ -116,7 +114,6 @@
                 <h3 class="text-xl font-bold text-gray-800">Thêm Từ Mới</h3>
                 <button onclick="toggleWordModal(false)" class="text-gray-400 hover:text-red-500 transition text-2xl">&times;</button>
             </div>
-            
             <form id="addWordForm" class="p-6 space-y-3">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Lưu vào bộ *</label>
@@ -124,7 +121,6 @@
                         <option value="">Đang tải danh sách bộ từ vựng...</option>
                     </select>
                 </div>
-
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Từ tiếng Anh *</label>
@@ -135,7 +131,6 @@
                         <input type="text" id="meaning" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" required>
                     </div>
                 </div>
-                
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Loại từ</label>
@@ -146,7 +141,6 @@
                         <input type="text" id="phonetic" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                 </div>
-
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Câu ví dụ</label>
                     <input type="text" id="example" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="vd: This is an example.">
@@ -155,7 +149,6 @@
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Dịch câu ví dụ</label>
                     <input type="text" id="exampleTrans" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="vd: Đây là một ví dụ.">
                 </div>
-
                 <div class="flex gap-3 pt-4 mt-2 border-t border-gray-100">
                     <button type="button" onclick="toggleWordModal(false)" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition">Bỏ qua</button>
                     <button type="submit" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition shadow-md">Lưu từ vựng</button>
@@ -173,7 +166,6 @@
                 </div>
                 <button onclick="document.getElementById('viewListModal').classList.add('hidden')" class="text-gray-400 hover:text-red-500 transition text-2xl">&times;</button>
             </div>
-            
             <div class="overflow-y-auto p-6 flex-1 bg-white">
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -191,7 +183,7 @@
     </div>
 
     <script>
-        // --- 1. Logic chuyển Tab và sáng màu Menu ---
+        // 1. Chuyển Tab
         function switchTab(tabName) {
             document.getElementById('tab-dashboard').classList.add('hidden');
             document.getElementById('tab-sets').classList.add('hidden');
@@ -216,26 +208,39 @@
             });
         }
 
-        // --- 2. Logic Bật/Tắt các Modal ---
+        // 2. Tắt/Bật Modal
         function toggleWordModal(show) {
             const modal = document.getElementById('addWordModal');
             if(show) modal.classList.remove('hidden');
-            else {
-                modal.classList.add('hidden');
-                document.getElementById('addWordForm').reset();
-            }
+            else { modal.classList.add('hidden'); document.getElementById('addWordForm').reset(); }
         }
 
         function toggleSetModal(show) {
             const modal = document.getElementById('addSetModal');
             if(show) modal.classList.remove('hidden');
-            else {
-                modal.classList.add('hidden');
-                document.getElementById('addSetForm').reset();
+            else { modal.classList.add('hidden'); document.getElementById('addSetForm').reset(); }
+        }
+
+        // 3. API Lấy Thống Kê (MỚI THÊM)
+        async function fetchDashboardStats() {
+            try {
+                const res = await fetch('https://vocab-api-9689.onrender.com/api/progress/stats?user_id=1');
+                if(res.ok) {
+                    const stats = await res.json();
+                    document.getElementById('dashLearned').innerText = stats.learned_words;
+                    document.getElementById('dashNeedReview').innerText = stats.need_review;
+                } else {
+                    document.getElementById('dashLearned').innerText = "0";
+                    document.getElementById('dashNeedReview').innerText = "0";
+                }
+            } catch (err) {
+                console.log("Lỗi tải thống kê tổng quan", err);
+                document.getElementById('dashLearned').innerText = "Lỗi";
+                document.getElementById('dashNeedReview').innerText = "Lỗi";
             }
         }
 
-        // --- 3. Logic Fetch dữ liệu Bộ từ vựng & Nạp vào Giao diện ---
+        // 4. API Lấy Bộ Từ Vựng
         async function fetchSets() {
             const container = document.getElementById('sets-container');
             const dropdown = document.getElementById('wordSetId');
@@ -266,19 +271,19 @@
                                 <p class="text-sm text-gray-500 mb-4 line-clamp-2">${vocabSet.description || 'Không có mô tả'}</p>
                             </div>
                             <div class="flex gap-2 mt-2 pt-4 border-t border-gray-50">
-                                <a href="learn.html?set_id=${vocabSet.id}" class="flex-1 text-center bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-100 transition shadow-sm" title="Ôn tập">
-                                    <i class="fa-solid fa-bolt mr-1"></i> Ôn tập
-                                </a>
-                                <button onclick="viewWordList(${vocabSet.id}, '${vocabSet.title}')" class="px-4 py-2 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100 transition" title="Xem danh sách">
-                                    <i class="fa-solid fa-list"></i>
-                                </button>
-                                <button onclick="editSet(${vocabSet.id}, '${vocabSet.title}', '${vocabSet.description}')" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition" title="Sửa">
-                                    <i class="fa-solid fa-pen"></i>
-                                </button>
-                                <button onclick="deleteSet(${vocabSet.id})" class="px-4 py-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition" title="Xóa">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
+                                 <a href="learn.html?set_id=${vocabSet.id}" class="flex-1 text-center bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-100 transition shadow-sm">
+                                     <i class="fa-solid fa-bolt mr-1"></i> Ôn tập
+                                 </a>
+                                 <button onclick="viewWordList(${vocabSet.id}, '${vocabSet.title}')" class="px-4 py-2 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100 transition" title="Xem danh sách">
+                                     <i class="fa-solid fa-list"></i>
+                                 </button>
+                                 <button onclick="editSet(${vocabSet.id}, '${vocabSet.title}', '${vocabSet.description}')" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition">
+                                     <i class="fa-solid fa-pen"></i>
+                                 </button>
+                                 <button onclick="deleteSet(${vocabSet.id})" class="px-4 py-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition">
+                                     <i class="fa-solid fa-trash"></i>
+                                 </button>
+                             </div>
                         </div>
                     `;
                     container.innerHTML += cardHTML;
@@ -289,15 +294,13 @@
             }
         }
 
-        // --- 4. Logic Sửa / Xóa Bộ Từ Vựng ---
+        // 5. Logic Sửa / Xóa
         async function deleteSet(setId) {
             if (!confirm("Bạn có chắc chắn muốn xóa bộ này? TOÀN BỘ từ vựng bên trong cũng sẽ bị xóa vĩnh viễn!")) return;
             try {
                 const res = await fetch(`https://vocab-api-9689.onrender.com/api/sets/${setId}`, { method: 'DELETE' });
-                if (res.ok) {
-                    alert("Đã xóa thành công!");
-                    fetchSets();
-                } else alert("Lỗi khi xóa.");
+                if (res.ok) { alert("Đã xóa thành công!"); fetchSets(); fetchDashboardStats(); } 
+                else alert("Lỗi khi xóa.");
             } catch(err) { alert("Lỗi kết nối máy chủ!"); }
         }
 
@@ -311,14 +314,12 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ title: newTitle, description: newDesc || "" })
                 });
-                if (res.ok) {
-                    alert("Cập nhật thành công!");
-                    fetchSets();
-                } else alert("Lỗi khi cập nhật.");
+                if (res.ok) { alert("Cập nhật thành công!"); fetchSets(); } 
+                else alert("Lỗi khi cập nhật.");
             } catch(err) { alert("Lỗi kết nối máy chủ!"); }
         }
 
-        // --- 5. Logic Xem Danh sách Từ vựng của 1 bộ ---
+        // 6. Logic Danh sách từ
         async function viewWordList(setId, setTitle) {
             document.getElementById('viewListModal').classList.remove('hidden');
             document.getElementById('listTitle').innerText = setTitle;
@@ -332,7 +333,6 @@
                 const data = await res.json();
                 
                 document.getElementById('listCount').innerText = `Tổng cộng: ${data.total_words} từ`;
-                
                 if(data.total_words === 0) {
                     tbody.innerHTML = '<tr><td colspan="3" class="py-4 text-center text-gray-400">Bộ này chưa có từ vựng nào.</td></tr>';
                     return;
@@ -353,30 +353,24 @@
             }
         }
 
-        // --- 6. Submit Form Tạo Bộ Từ Vựng ---
+        // 7. Logic Form Submit
         document.getElementById('addSetForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
             btn.innerText = "Đang tạo...";
-            const newSet = {
-                title: document.getElementById('setTitle').value,
-                description: document.getElementById('setDesc').value
-            };
+            const newSet = { title: document.getElementById('setTitle').value, description: document.getElementById('setDesc').value };
             try {
                 const res = await fetch('https://vocab-api-9689.onrender.com/api/sets', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(newSet)
                 });
-                if (res.ok) {
-                    toggleSetModal(false);
-                    fetchSets();
-                } else alert("Lỗi khi tạo bộ từ vựng.");
+                if (res.ok) { toggleSetModal(false); fetchSets(); } 
+                else alert("Lỗi khi tạo bộ từ vựng.");
             } catch(err) { alert("Lỗi kết nối!"); } 
             finally { btn.innerText = "Tạo ngay"; }
         });
 
-        // --- 7. Submit Form Thêm Từ Vựng ---
         document.getElementById('addWordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
@@ -396,16 +390,23 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(newWord)
                 });
-                if (res.ok) {
-                    toggleWordModal(false);
-                    alert("Đã thêm từ vựng thành công!");
-                } else alert("Lỗi khi lưu từ vựng.");
+                if (res.ok) { 
+                    toggleWordModal(false); 
+                    alert("Đã thêm từ vựng thành công!"); 
+                    fetchDashboardStats(); // Cập nhật lại số lượng trên Dashboard
+                } 
+                else alert("Lỗi khi lưu từ vựng.");
             } catch(err) { alert("Lỗi kết nối!"); } 
             finally { btn.innerText = "Lưu từ vựng"; }
         });
 
-        // Khởi tạo ngay khi mở trang
-        document.addEventListener("DOMContentLoaded", fetchSets);
+        // ==========================================
+        // QUAN TRỌNG: Gọi cả 2 API khi vừa mở trang
+        // ==========================================
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchSets();
+            fetchDashboardStats();
+        });
     </script>
 </body>
 </html>
