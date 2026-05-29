@@ -21,7 +21,7 @@
             <button onclick="switchTab('sets')" class="w-full flex items-center space-x-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-600 rounded-xl font-medium transition">
                 <i class="fa-solid fa-layer-group w-5"></i><span>Bộ từ vựng</span>
             </button>
-            <button onclick="toggleModal(true)" class="w-full flex items-center space-x-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-600 rounded-xl font-medium transition">
+            <button onclick="toggleWordModal(true)" class="w-full flex items-center space-x-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-600 rounded-xl font-medium transition">
                 <i class="fa-solid fa-plus-circle w-5"></i><span>Thêm từ mới</span>
             </button>
         </nav>
@@ -30,7 +30,7 @@
     <main class="flex-1 flex flex-col h-screen overflow-y-auto pb-20 md:pb-0 relative">
         <header class="md:hidden bg-white p-4 border-b border-gray-200 flex justify-between items-center sticky top-0 z-10">
             <span class="text-xl font-extrabold text-blue-600">VocabApp</span>
-            <button onclick="toggleModal(true)" class="text-blue-600 font-bold"><i class="fa-solid fa-plus text-xl"></i></button>
+            <button onclick="toggleWordModal(true)" class="text-blue-600 font-bold"><i class="fa-solid fa-plus text-xl"></i></button>
         </header>
 
         <div class="p-4 md:p-8 max-w-5xl mx-auto w-full">
@@ -52,9 +52,9 @@
                 <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-5 flex flex-col md:flex-row justify-between md:items-center gap-4">
                     <div>
                         <h4 class="text-lg font-bold text-gray-800">TOEIC Mục tiêu 600+</h4>
-                        <p class="text-sm text-gray-500 mt-1">Tiến độ: 45/100 từ</p>
+                        <p class="text-sm text-gray-500 mt-1">Ôn tập ngay để duy trì chuỗi ngày học tập.</p>
                     </div>
-                    <a href="learn.html" class="text-center bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow hover:bg-blue-700">
+                    <a href="learn.html?set_id=1" class="text-center bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow hover:bg-blue-700">
                         Học ngay
                     </a>
                 </div>
@@ -63,7 +63,7 @@
             <div id="tab-sets" class="hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <h2 class="text-2xl font-bold">Tất cả Bộ từ vựng</h2>
-                    <button class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold text-sm hover:bg-indigo-200">+ Tạo bộ mới</button>
+                    <button onclick="toggleSetModal(true)" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold text-sm hover:bg-indigo-200 transition">+ Tạo bộ mới</button>
                 </div>
                 <div id="sets-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-500 text-center py-10 bg-white rounded-2xl border border-dashed border-gray-300">
                     Đang tải dữ liệu bộ từ vựng từ máy chủ...
@@ -74,25 +74,57 @@
     </main>
 
     <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around items-center pb-safe z-10">
-        <button onclick="switchTab('dashboard')" class="flex flex-col items-center py-3 px-4 text-blue-600">
+        <button onclick="switchTab('dashboard')" class="flex flex-col items-center py-3 px-4 text-blue-600 transition">
             <i class="fa-solid fa-house text-xl mb-1"></i><span class="text-[10px] font-bold">Tổng quan</span>
         </button>
-        <button onclick="switchTab('sets')" class="flex flex-col items-center py-3 px-4 text-gray-400 hover:text-blue-600">
+        <button onclick="switchTab('sets')" class="flex flex-col items-center py-3 px-4 text-gray-400 hover:text-blue-600 transition">
             <i class="fa-solid fa-layer-group text-xl mb-1"></i><span class="text-[10px] font-bold">Bộ từ vựng</span>
         </button>
-        <button onclick="toggleModal(true)" class="flex flex-col items-center py-3 px-4 text-gray-400 hover:text-blue-600">
+        <button onclick="toggleWordModal(true)" class="flex flex-col items-center py-3 px-4 text-gray-400 hover:text-blue-600 transition">
             <i class="fa-solid fa-plus-circle text-xl mb-1"></i><span class="text-[10px] font-bold">Thêm từ</span>
         </button>
     </nav>
 
-    <div id="addWordModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all">
+    <div id="addSetModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
             <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-gray-800">Thêm Từ Mới</h3>
-                <button onclick="toggleModal(false)" class="text-gray-400 hover:text-red-500 transition text-2xl">&times;</button>
+                <h3 class="text-xl font-bold text-gray-800">Tạo Bộ Từ Vựng Mới</h3>
+                <button onclick="toggleSetModal(false)" class="text-gray-400 hover:text-red-500 transition text-2xl">&times;</button>
             </div>
             
-            <form id="addWordForm" class="p-6 space-y-4">
+            <form id="addSetForm" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tên bộ từ vựng *</label>
+                    <input type="text" id="setTitle" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mô tả chi tiết</label>
+                    <textarea id="setDesc" rows="3" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-4 mt-4 border-t border-gray-100">
+                    <button type="button" onclick="toggleSetModal(false)" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition">Bỏ qua</button>
+                    <button type="submit" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition shadow-md">Tạo ngay</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="addWordModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Thêm Từ Mới</h3>
+                <button onclick="toggleWordModal(false)" class="text-gray-400 hover:text-red-500 transition text-2xl">&times;</button>
+            </div>
+            
+            <form id="addWordForm" class="p-6 space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Lưu vào bộ *</label>
+                    <select id="wordSetId" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" required>
+                        <option value="">Đang tải danh sách bộ từ vựng...</option>
+                    </select>
+                </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Từ tiếng Anh *</label>
@@ -115,100 +147,100 @@
                     </div>
                 </div>
 
-                <div class="flex gap-3 pt-4 mt-4 border-t border-gray-100">
-                    <button type="button" onclick="toggleModal(false)" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition">
-                        Bỏ qua
-                    </button>
-                    <button type="submit" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition shadow-md">
-                        Lưu từ vựng
-                    </button>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Câu ví dụ</label>
+                    <input type="text" id="example" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="vd: This is an example.">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Dịch câu ví dụ</label>
+                    <input type="text" id="exampleTrans" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="vd: Đây là một ví dụ.">
+                </div>
+
+                <div class="flex gap-3 pt-4 mt-2 border-t border-gray-100">
+                    <button type="button" onclick="toggleWordModal(false)" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition">Bỏ qua</button>
+                    <button type="submit" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition shadow-md">Lưu từ vựng</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        // Hàm Bật/Tắt Popup
-        function toggleModal(show) {
-            const modal = document.getElementById('addWordModal');
-            if(show) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-                document.getElementById('addWordForm').reset(); // Xóa dữ liệu cũ khi đóng
-            }
-        }
-
-        // Hàm Chuyển Tab (Từ Dashboard sang Bộ từ vựng)
-        // Hàm Chuyển Tab và Đổi màu Menu
+        // 1. Logic chuyển Tab và sáng màu Menu
         function switchTab(tabName) {
-            // 1. Ẩn/Hiện nội dung chính
             document.getElementById('tab-dashboard').classList.add('hidden');
             document.getElementById('tab-sets').classList.add('hidden');
             document.getElementById(`tab-${tabName}`).classList.remove('hidden');
 
-            // 2. Tìm tất cả các nút có lệnh switchTab để reset về màu xám
             const buttons = document.querySelectorAll(`button[onclick^="switchTab"]`);
             buttons.forEach(btn => {
                 if (btn.classList.contains('flex-col')) { 
-                    // Reset CSS cho nút Mobile
                     btn.className = "flex flex-col items-center py-3 px-4 text-gray-400 hover:text-blue-600 transition";
                 } else { 
-                    // Reset CSS cho nút Laptop
                     btn.className = "w-full flex items-center space-x-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-600 rounded-xl font-medium transition";
                 }
             });
 
-            // 3. Tìm các nút của Tab đang được chọn để tô màu xanh
             const activeButtons = document.querySelectorAll(`button[onclick="switchTab('${tabName}')"]`);
             activeButtons.forEach(btn => {
                 if (btn.classList.contains('flex-col')) { 
-                    // Active CSS cho nút Mobile
                     btn.className = "flex flex-col items-center py-3 px-4 text-blue-600 transition";
                 } else { 
-                    // Active CSS cho nút Laptop
                     btn.className = "w-full flex items-center space-x-3 p-3 bg-blue-50 text-blue-600 rounded-xl font-medium transition";
                 }
             });
         }
 
-        // --- HÀM TẢI DỮ LIỆU BỘ TỪ VỰNG TỪ BACKEND ---
+        // 2. Logic Bật/Tắt các Modal
+        function toggleWordModal(show) {
+            const modal = document.getElementById('addWordModal');
+            if(show) modal.classList.remove('hidden');
+            else {
+                modal.classList.add('hidden');
+                document.getElementById('addWordForm').reset();
+            }
+        }
+
+        function toggleSetModal(show) {
+            const modal = document.getElementById('addSetModal');
+            if(show) modal.classList.remove('hidden');
+            else {
+                modal.classList.add('hidden');
+                document.getElementById('addSetForm').reset();
+            }
+        }
+
+        // 3. Logic Fetch dữ liệu Bộ từ vựng & Nạp vào Dropdown
         async function fetchSets() {
             const container = document.getElementById('sets-container');
+            const dropdown = document.getElementById('wordSetId');
             
             try {
-                // Gọi API lấy danh sách bộ từ vựng
                 const response = await fetch('https://vocab-api-9689.onrender.com/api/sets');
-                
-                if (!response.ok) throw new Error("Lỗi mạng hoặc Backend chưa phản hồi");
+                if (!response.ok) throw new Error("Lỗi API");
                 const sets = await response.json();
                 
-                // Xóa dòng chữ "Đang tải dữ liệu..."
                 container.innerHTML = '';
                 container.classList.remove('py-10', 'border-dashed', 'border-gray-300', 'text-center');
+                dropdown.innerHTML = ''; // Xóa dữ liệu cũ của dropdown
 
-                // Nếu chưa có bộ từ vựng nào
                 if (sets.length === 0) {
-                    container.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8">Chưa có bộ từ vựng nào trong Database.</p>';
+                    container.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8">Chưa có bộ từ vựng nào.</p>';
+                    dropdown.innerHTML = '<option value="">Vui lòng tạo bộ từ vựng trước</option>';
                     return;
                 }
 
-                // Dùng vòng lặp đổ từng bộ từ vựng ra giao diện
+                // Render dữ liệu ra giao diện
                 sets.forEach(vocabSet => {
-                    // vocabSet.title và vocabSet.description là tên cột trong Database (có thể là name thay vì title)
-                    const title = vocabSet.title || vocabSet.name || `Bộ từ vựng #${vocabSet.id}`;
-                    const desc = vocabSet.description || 'Chưa có mô tả cho bộ từ vựng này.';
-                    
+                    // Đổ ra giao diện Tab "Bộ từ vựng"
                     const cardHTML = `
                         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition p-5 flex flex-col justify-between text-left">
                             <div>
                                 <div class="flex items-center space-x-2 mb-2">
                                     <span class="px-2 py-1 bg-blue-100 text-blue-700 text-[10px] font-bold rounded uppercase">ID: ${vocabSet.id}</span>
                                 </div>
-                                <h4 class="text-lg font-bold text-gray-800 mb-1">${title}</h4>
-                                <p class="text-sm text-gray-500 mb-4 line-clamp-2">${desc}</p>
+                                <h4 class="text-lg font-bold text-gray-800 mb-1">${vocabSet.title}</h4>
+                                <p class="text-sm text-gray-500 mb-4 line-clamp-2">${vocabSet.description || 'Không có mô tả'}</p>
                             </div>
-                            
                             <div class="flex gap-2 mt-2 pt-4 border-t border-gray-50">
                                 <a href="learn.html?set_id=${vocabSet.id}" class="flex-1 text-center bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-100 transition shadow-sm">
                                     <i class="fa-solid fa-bolt mr-1"></i> Ôn tập
@@ -217,30 +249,55 @@
                         </div>
                     `;
                     container.innerHTML += cardHTML;
+
+                    // Đổ tên bộ từ vựng vào Dropdown của Form thêm từ mới
+                    dropdown.innerHTML += `<option value="${vocabSet.id}">${vocabSet.title}</option>`;
                 });
             } catch (error) {
-                console.error(error);
-                container.innerHTML = '<p class="col-span-full text-center text-red-500 py-8"><i class="fa-solid fa-triangle-exclamation mb-2 text-2xl block"></i> Không thể kết nối đến máy chủ. Vui lòng tải lại trang.</p>';
+                container.innerHTML = '<p class="col-span-full text-center text-red-500 py-8">Không thể tải dữ liệu.</p>';
             }
         }
 
-        // Gọi hàm fetchSets ngay khi trang Web vừa load xong
-        document.addEventListener("DOMContentLoaded", () => {
-            fetchSets();
+        // 4. Submit Form Tạo Bộ Từ Vựng
+        document.getElementById('addSetForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerText = "Đang tạo...";
+            
+            const newSet = {
+                title: document.getElementById('setTitle').value,
+                description: document.getElementById('setDesc').value
+            };
+
+            try {
+                const res = await fetch('https://vocab-api-9689.onrender.com/api/sets', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(newSet)
+                });
+                
+                if (res.ok) {
+                    toggleSetModal(false);
+                    fetchSets(); // Load lại danh sách ngay lập tức để hiện bộ mới
+                } else alert("Lỗi khi tạo bộ từ vựng.");
+            } catch(err) { alert("Lỗi kết nối!"); } 
+            finally { btn.innerText = "Tạo ngay"; }
         });
 
-        // Gửi dữ liệu lên API khi bấm Lưu
+        // 5. Submit Form Thêm Từ Vựng
         document.getElementById('addWordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btnSubmit = e.target.querySelector('button[type="submit"]');
-            btnSubmit.innerText = "Đang lưu...";
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerText = "Đang lưu...";
             
             const newWord = {
-                set_id: 1, // Tạm gắn cứng vào bộ số 1
+                set_id: parseInt(document.getElementById('wordSetId').value), // Lấy ID từ Dropdown
                 word: document.getElementById('word').value,
+                meaning: document.getElementById('meaning').value,
                 part_of_speech: document.getElementById('pos').value,
                 phonetic: document.getElementById('phonetic').value,
-                meaning: document.getElementById('meaning').value
+                example: document.getElementById('example').value,          // Lấy câu ví dụ
+                example_translation: document.getElementById('exampleTrans').value // Lấy dịch câu ví dụ
             };
 
             try {
@@ -251,15 +308,15 @@
                 });
                 
                 if (res.ok) {
-                    toggleModal(false); // Đóng popup khi lưu xong
-                    // Optional: Hiện thông báo góc màn hình (Toast) thay vì alert
-                }
-            } catch(err) { 
-                alert("Lỗi kết nối!"); 
-            } finally {
-                btnSubmit.innerText = "Lưu từ vựng";
-            }
+                    toggleWordModal(false);
+                    alert("Đã thêm từ vựng thành công!");
+                } else alert("Lỗi khi lưu từ vựng.");
+            } catch(err) { alert("Lỗi kết nối!"); } 
+            finally { btn.innerText = "Lưu từ vựng"; }
         });
+
+        // Khởi tạo ngay khi mở trang
+        document.addEventListener("DOMContentLoaded", fetchSets);
     </script>
 </body>
 </html>
