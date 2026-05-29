@@ -164,8 +164,34 @@
         </div>
     </div>
 
+    <div id="viewListModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <div>
+                    <h3 id="listTitle" class="text-xl font-bold text-gray-800">Danh sách từ vựng</h3>
+                    <p id="listCount" class="text-sm text-blue-600 font-bold mt-1">Đang tải...</p>
+                </div>
+                <button onclick="document.getElementById('viewListModal').classList.add('hidden')" class="text-gray-400 hover:text-red-500 transition text-2xl">&times;</button>
+            </div>
+            
+            <div class="overflow-y-auto p-6 flex-1 bg-white">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b-2 border-gray-100 text-gray-500 text-sm uppercase">
+                            <th class="pb-3 w-1/3">Từ vựng</th>
+                            <th class="pb-3 w-1/3">Loại từ</th>
+                            <th class="pb-3 w-1/3">Nghĩa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="wordListTableBody" class="text-gray-700">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // 1. Logic chuyển Tab và sáng màu Menu
+        // --- 1. Logic chuyển Tab và sáng màu Menu ---
         function switchTab(tabName) {
             document.getElementById('tab-dashboard').classList.add('hidden');
             document.getElementById('tab-sets').classList.add('hidden');
@@ -190,7 +216,7 @@
             });
         }
 
-        // 2. Logic Bật/Tắt các Modal
+        // --- 2. Logic Bật/Tắt các Modal ---
         function toggleWordModal(show) {
             const modal = document.getElementById('addWordModal');
             if(show) modal.classList.remove('hidden');
@@ -209,7 +235,7 @@
             }
         }
 
-        // 3. Logic Fetch dữ liệu Bộ từ vựng & Nạp vào Dropdown
+        // --- 3. Logic Fetch dữ liệu Bộ từ vựng & Nạp vào Giao diện ---
         async function fetchSets() {
             const container = document.getElementById('sets-container');
             const dropdown = document.getElementById('wordSetId');
@@ -221,7 +247,7 @@
                 
                 container.innerHTML = '';
                 container.classList.remove('py-10', 'border-dashed', 'border-gray-300', 'text-center');
-                dropdown.innerHTML = ''; // Xóa dữ liệu cũ của dropdown
+                dropdown.innerHTML = '';
 
                 if (sets.length === 0) {
                     container.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8">Chưa có bộ từ vựng nào.</p>';
@@ -229,9 +255,7 @@
                     return;
                 }
 
-                // Render dữ liệu ra giao diện
                 sets.forEach(vocabSet => {
-                    // Đổ ra giao diện Tab "Bộ từ vựng"
                     const cardHTML = `
                         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition p-5 flex flex-col justify-between text-left">
                             <div>
@@ -242,15 +266,22 @@
                                 <p class="text-sm text-gray-500 mb-4 line-clamp-2">${vocabSet.description || 'Không có mô tả'}</p>
                             </div>
                             <div class="flex gap-2 mt-2 pt-4 border-t border-gray-50">
-                                <a href="learn.html?set_id=${vocabSet.id}" class="flex-1 text-center bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-100 transition shadow-sm">
+                                <a href="learn.html?set_id=${vocabSet.id}" class="flex-1 text-center bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-100 transition shadow-sm" title="Ôn tập">
                                     <i class="fa-solid fa-bolt mr-1"></i> Ôn tập
                                 </a>
+                                <button onclick="viewWordList(${vocabSet.id}, '${vocabSet.title}')" class="px-4 py-2 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100 transition" title="Xem danh sách">
+                                    <i class="fa-solid fa-list"></i>
+                                </button>
+                                <button onclick="editSet(${vocabSet.id}, '${vocabSet.title}', '${vocabSet.description}')" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition" title="Sửa">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button onclick="deleteSet(${vocabSet.id})" class="px-4 py-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition" title="Xóa">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
                             </div>
                         </div>
                     `;
                     container.innerHTML += cardHTML;
-
-                    // Đổ tên bộ từ vựng vào Dropdown của Form thêm từ mới
                     dropdown.innerHTML += `<option value="${vocabSet.id}">${vocabSet.title}</option>`;
                 });
             } catch (error) {
@@ -258,55 +289,113 @@
             }
         }
 
-        // 4. Submit Form Tạo Bộ Từ Vựng
+        // --- 4. Logic Sửa / Xóa Bộ Từ Vựng ---
+        async function deleteSet(setId) {
+            if (!confirm("Bạn có chắc chắn muốn xóa bộ này? TOÀN BỘ từ vựng bên trong cũng sẽ bị xóa vĩnh viễn!")) return;
+            try {
+                const res = await fetch(`https://vocab-api-9689.onrender.com/api/sets/${setId}`, { method: 'DELETE' });
+                if (res.ok) {
+                    alert("Đã xóa thành công!");
+                    fetchSets();
+                } else alert("Lỗi khi xóa.");
+            } catch(err) { alert("Lỗi kết nối máy chủ!"); }
+        }
+
+        async function editSet(setId, oldTitle, oldDesc) {
+            const newTitle = prompt("Nhập tên mới:", oldTitle);
+            if (!newTitle) return; 
+            const newDesc = prompt("Nhập mô tả mới:", oldDesc);
+            try {
+                const res = await fetch(`https://vocab-api-9689.onrender.com/api/sets/${setId}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ title: newTitle, description: newDesc || "" })
+                });
+                if (res.ok) {
+                    alert("Cập nhật thành công!");
+                    fetchSets();
+                } else alert("Lỗi khi cập nhật.");
+            } catch(err) { alert("Lỗi kết nối máy chủ!"); }
+        }
+
+        // --- 5. Logic Xem Danh sách Từ vựng của 1 bộ ---
+        async function viewWordList(setId, setTitle) {
+            document.getElementById('viewListModal').classList.remove('hidden');
+            document.getElementById('listTitle').innerText = setTitle;
+            document.getElementById('listCount').innerText = "Đang tải dữ liệu...";
+            const tbody = document.getElementById('wordListTableBody');
+            tbody.innerHTML = '<tr><td colspan="3" class="py-4 text-center text-gray-400">Đang kéo dữ liệu từ máy chủ...</td></tr>';
+
+            try {
+                const res = await fetch(`https://vocab-api-9689.onrender.com/api/sets/${setId}/flashcards?user_id=1`);
+                if (!res.ok) throw new Error("Lỗi mạng");
+                const data = await res.json();
+                
+                document.getElementById('listCount').innerText = `Tổng cộng: ${data.total_words} từ`;
+                
+                if(data.total_words === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="py-4 text-center text-gray-400">Bộ này chưa có từ vựng nào.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                data.words.forEach(w => {
+                    tbody.innerHTML += `
+                        <tr class="border-b border-gray-50 hover:bg-blue-50 transition">
+                            <td class="py-3 font-bold text-blue-600">${w.word}</td>
+                            <td class="py-3"><span class="px-2 py-1 bg-gray-100 text-xs rounded uppercase">${w.part_of_speech || '-'}</span></td>
+                            <td class="py-3">${w.meaning}</td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="3" class="py-4 text-center text-red-500">Lỗi kết nối.</td></tr>';
+            }
+        }
+
+        // --- 6. Submit Form Tạo Bộ Từ Vựng ---
         document.getElementById('addSetForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
             btn.innerText = "Đang tạo...";
-            
             const newSet = {
                 title: document.getElementById('setTitle').value,
                 description: document.getElementById('setDesc').value
             };
-
             try {
                 const res = await fetch('https://vocab-api-9689.onrender.com/api/sets', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(newSet)
                 });
-                
                 if (res.ok) {
                     toggleSetModal(false);
-                    fetchSets(); // Load lại danh sách ngay lập tức để hiện bộ mới
+                    fetchSets();
                 } else alert("Lỗi khi tạo bộ từ vựng.");
             } catch(err) { alert("Lỗi kết nối!"); } 
             finally { btn.innerText = "Tạo ngay"; }
         });
 
-        // 5. Submit Form Thêm Từ Vựng
+        // --- 7. Submit Form Thêm Từ Vựng ---
         document.getElementById('addWordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
             btn.innerText = "Đang lưu...";
-            
             const newWord = {
-                set_id: parseInt(document.getElementById('wordSetId').value), // Lấy ID từ Dropdown
+                set_id: parseInt(document.getElementById('wordSetId').value),
                 word: document.getElementById('word').value,
                 meaning: document.getElementById('meaning').value,
                 part_of_speech: document.getElementById('pos').value,
                 phonetic: document.getElementById('phonetic').value,
-                example: document.getElementById('example').value,          // Lấy câu ví dụ
-                example_translation: document.getElementById('exampleTrans').value // Lấy dịch câu ví dụ
+                example: document.getElementById('example').value,
+                example_translation: document.getElementById('exampleTrans').value
             };
-
             try {
                 const res = await fetch('https://vocab-api-9689.onrender.com/api/words', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(newWord)
                 });
-                
                 if (res.ok) {
                     toggleWordModal(false);
                     alert("Đã thêm từ vựng thành công!");

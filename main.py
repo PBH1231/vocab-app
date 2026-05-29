@@ -248,3 +248,38 @@ def update_progress(
             "last_reviewed": progress.last_reviewed
         }
     }
+
+# =========================
+# API: SỬA VÀ XÓA BỘ TỪ VỰNG
+# =========================
+
+@app.put("/api/sets/{set_id}")
+def update_set(set_id: int, data: VocabularySetCreate, db: Session = Depends(get_db)):
+    vocab_set = db.query(VocabularySet).filter(VocabularySet.id == set_id).first()
+    if not vocab_set:
+        raise HTTPException(status_code=404, detail="Không tìm thấy bộ từ vựng")
+    
+    vocab_set.title = data.title
+    vocab_set.description = data.description
+    db.commit()
+    return {"message": "Đã cập nhật thành công"}
+
+@app.delete("/api/sets/{set_id}")
+def delete_set(set_id: int, db: Session = Depends(get_db)):
+    vocab_set = db.query(VocabularySet).filter(VocabularySet.id == set_id).first()
+    if not vocab_set:
+        raise HTTPException(status_code=404, detail="Không tìm thấy bộ từ vựng")
+    
+    # Dọn dẹp dữ liệu con: Lấy các từ vựng thuộc bộ này
+    words = db.query(Vocabulary).filter(Vocabulary.set_id == set_id).all()
+    for word in words:
+        # Xóa tiến độ học của từng từ
+        db.query(UserProgress).filter(UserProgress.vocab_id == word.id).delete()
+    
+    # Xóa các từ vựng trong bộ
+    db.query(Vocabulary).filter(Vocabulary.set_id == set_id).delete()
+    # Cuối cùng mới xóa Bộ từ vựng
+    db.delete(vocab_set)
+    db.commit()
+    
+    return {"message": "Đã xóa bộ từ vựng thành công"}
