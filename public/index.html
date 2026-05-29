@@ -140,10 +140,36 @@
         }
 
         // Hàm Chuyển Tab (Từ Dashboard sang Bộ từ vựng)
+        // Hàm Chuyển Tab và Đổi màu Menu
         function switchTab(tabName) {
+            // 1. Ẩn/Hiện nội dung chính
             document.getElementById('tab-dashboard').classList.add('hidden');
             document.getElementById('tab-sets').classList.add('hidden');
             document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            // 2. Tìm tất cả các nút có lệnh switchTab để reset về màu xám
+            const buttons = document.querySelectorAll(`button[onclick^="switchTab"]`);
+            buttons.forEach(btn => {
+                if (btn.classList.contains('flex-col')) { 
+                    // Reset CSS cho nút Mobile
+                    btn.className = "flex flex-col items-center py-3 px-4 text-gray-400 hover:text-blue-600 transition";
+                } else { 
+                    // Reset CSS cho nút Laptop
+                    btn.className = "w-full flex items-center space-x-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-600 rounded-xl font-medium transition";
+                }
+            });
+
+            // 3. Tìm các nút của Tab đang được chọn để tô màu xanh
+            const activeButtons = document.querySelectorAll(`button[onclick="switchTab('${tabName}')"]`);
+            activeButtons.forEach(btn => {
+                if (btn.classList.contains('flex-col')) { 
+                    // Active CSS cho nút Mobile
+                    btn.className = "flex flex-col items-center py-3 px-4 text-blue-600 transition";
+                } else { 
+                    // Active CSS cho nút Laptop
+                    btn.className = "w-full flex items-center space-x-3 p-3 bg-blue-50 text-blue-600 rounded-xl font-medium transition";
+                }
+            });
         }
 
         // --- HÀM TẢI DỮ LIỆU BỘ TỪ VỰNG TỪ BACKEND ---

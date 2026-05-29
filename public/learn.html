@@ -3,166 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Học Từ Vựng - Flashcards</title>
+    <title>Ôn Tập Flashcards</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* CSS cho hiệu ứng lật thẻ 3D */
-        .perspective { perspective: 1000px; }
-        .preserve-3d { transform-style: preserve-3d; }
+        /* Hiệu ứng lật thẻ 3D */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
         .backface-hidden { backface-visibility: hidden; }
         .rotate-y-180 { transform: rotateY(180deg); }
-        .card-transition { transition: transform 0.4s ease-in-out; }
+        .card-transition { transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); }
     </style>
 </head>
-<body class="bg-gray-50 flex flex-col items-center justify-center min-h-screen p-4">
+<body class="bg-gray-50 h-screen flex flex-col font-sans text-gray-800">
 
-    <div id="loading" class="text-xl font-semibold text-gray-600 mb-4">Đang tải dữ liệu...</div>
-    <div id="progressCounter" class="text-sm font-bold text-blue-500 mb-4 hidden">Từ 1 / 3</div>
+    <header class="bg-white p-4 shadow-sm flex items-center justify-between sticky top-0 z-10">
+        <a href="index.html" class="text-gray-500 hover:text-blue-600 transition p-2">
+            <i class="fa-solid fa-arrow-left text-xl"></i>
+        </a>
+        <h1 id="setHeader" class="font-bold text-lg text-gray-700 truncate px-4">Đang tải...</h1>
+        <div class="w-8"></div> </header>
 
-    <div id="flashcardContainer" class="w-full max-w-sm w-[350px] h-[500px] perspective cursor-pointer hidden" onclick="flipCard()">
-        <div id="flashcard" class="relative w-full h-full preserve-3d card-transition shadow-2xl rounded-2xl">
-            
-            <div class="absolute w-full h-full backface-hidden bg-white rounded-2xl flex flex-col items-center justify-center p-6 border-t-4 border-blue-500">
-                <h2 id="word" class="text-4xl font-bold text-gray-800 mb-2"></h2>
-                <p id="phonetic" class="text-gray-500 text-lg mb-1"></p>
-                <span id="pos" class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold mb-6"></span>
-                
-                <button onclick="playAudio(event)" class="p-4 bg-gray-100 rounded-full hover:bg-gray-200 transition shadow-sm">
-                    <svg class="w-8 h-8 text-gray-700" fill="currentColor" viewBox="0 0 20 20"><path d="M10 3.5a.5.5 0 00-.5.5v12a.5.5 0 001 0V4a.5.5 0 00-.5-.5z"/><path fill-rule="evenodd" d="M10.707 3.293a1 1 0 010 1.414L6.414 9H3a1 1 0 00-1 1v4a1 1 0 001 1h3.414l4.293 4.293a1 1 0 001.707-.707V3.5a1 1 0 00-1.707-.707z" clip-rule="evenodd"/></svg>
-                </button>
+    <main class="flex-1 flex flex-col items-center justify-center p-4 w-full max-w-md mx-auto">
+        
+        <div class="w-full flex justify-between text-sm font-bold text-gray-500 mb-4 px-2">
+            <span id="progressText">0 / 0</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+            <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+
+        <div id="flashcard-container" class="w-full perspective-1000 cursor-pointer h-80 relative" onclick="flipCard()">
+            <div id="card-front" class="absolute w-full h-full bg-white rounded-3xl shadow-lg border border-gray-100 flex flex-col items-center justify-center p-6 text-center transform-style-3d backface-hidden card-transition">
+                <span id="posLabel" class="absolute top-4 right-4 px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold uppercase rounded-lg hidden"></span>
+                <h2 id="wordText" class="text-4xl font-extrabold text-gray-800 mb-2">Đang tải...</h2>
+                <p id="phoneticText" class="text-gray-400 font-medium tracking-wide"></p>
+                <div class="absolute bottom-6 text-gray-300 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-hand-pointer"></i> Nhấn để xem nghĩa
+                </div>
             </div>
 
-            <div class="absolute w-full h-full backface-hidden bg-gray-50 rounded-2xl flex flex-col items-center justify-center p-6 rotate-y-180 border-t-4 border-green-500">
-                <h3 id="meaning" class="text-3xl font-bold text-gray-800 mb-6 text-center"></h3>
-                <div class="bg-white p-5 rounded-xl shadow-sm w-full mb-6 border border-gray-100">
-                    <p id="example" class="text-gray-700 italic mb-3 text-lg"></p>
-                    <p id="translation" class="text-gray-500 text-sm"></p>
+            <div id="card-back" class="absolute w-full h-full bg-blue-600 rounded-3xl shadow-lg flex flex-col items-center justify-center p-6 text-center transform-style-3d backface-hidden rotate-y-180 card-transition text-white">
+                <h2 id="meaningText" class="text-2xl font-bold mb-4"></h2>
+                <div id="exampleBox" class="bg-blue-700 bg-opacity-50 p-4 rounded-xl w-full hidden">
+                    <p id="exampleText" class="italic mb-2 text-sm"></p>
+                    <p id="exampleTransText" class="text-xs text-blue-200"></p>
                 </div>
-                <button onclick="markLearned(event)" class="mt-4 px-6 py-3 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 transition w-full shadow-md text-lg">
-                    Đã thuộc từ này
-                </button>
             </div>
         </div>
-    </div>
 
-    <button id="nextBtn" onclick="nextCard()" class="mt-8 px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition hidden">
-        Chưa thuộc, Bỏ qua ->
-    </button>
+        <div class="flex gap-4 w-full mt-10">
+            <button onclick="prevCard()" class="flex-1 bg-white border-2 border-gray-200 text-gray-600 font-bold py-4 rounded-2xl hover:bg-gray-50 hover:border-gray-300 transition shadow-sm">
+                <i class="fa-solid fa-arrow-left mr-2"></i> Trước
+            </button>
+            <button onclick="nextCard()" class="flex-1 bg-white border-2 border-blue-600 text-blue-600 font-bold py-4 rounded-2xl hover:bg-blue-50 transition shadow-sm">
+                Tiếp <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </main>
 
     <script>
-        let vocabList = [];
+        let words = [];
         let currentIndex = 0;
         let isFlipped = false;
 
-        // Tự động chạy khi load trang
-        document.addEventListener("DOMContentLoaded", fetchVocab);
+        // Bóc tách tham số set_id từ URL (Ví dụ: ?set_id=1)
+        const urlParams = new URLSearchParams(window.location.search);
+        const setId = urlParams.get('set_id') || 1; // Mặc định là 1 nếu không có tham số
 
-        // 1. Gọi API lấy dữ liệu
-        async function fetchVocab() {
+        async function init() {
             try {
-                const response = await fetch('https://vocab-api-9689.onrender.com/api/sets/1/flashcards?user_id=1');
-                const data = await response.json();
+                // Gọi API kéo từ vựng của đúng bộ đó
+                const res = await fetch(`https://vocab-api-9689.onrender.com/api/sets/${setId}/flashcards?user_id=1`);
+                const data = await res.json();
                 
-                vocabList = data.words;
-                
-                if (vocabList.length > 0) {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('flashcardContainer').classList.remove('hidden');
-                    document.getElementById('progressCounter').classList.remove('hidden');
-                    document.getElementById('nextBtn').classList.remove('hidden');
+                document.getElementById('setHeader').innerText = data.set_title || "Bộ Từ Vựng";
+                words = data.words;
+
+                if (words && words.length > 0) {
                     renderCard();
                 } else {
-                    document.getElementById('loading').innerText = "Không có từ vựng nào trong bộ này.";
+                    document.getElementById('wordText').innerText = "Trống";
+                    document.getElementById('phoneticText').innerText = "Chưa có từ vựng nào trong bộ này.";
                 }
             } catch (error) {
-                console.error("Lỗi:", error);
-                document.getElementById('loading').innerText = "Lỗi kết nối máy chủ!";
+                document.getElementById('wordText').innerText = "Lỗi mạng!";
+                document.getElementById('phoneticText').innerText = "Không thể kết nối máy chủ.";
             }
         }
 
-        // 2. Render dữ liệu lên thẻ
         function renderCard() {
-            if (currentIndex >= vocabList.length) {
-                document.getElementById('flashcardContainer').innerHTML = "<h2 class='text-2xl font-bold text-green-600 text-center mt-20'>Chúc mừng! Bạn đã ôn tập xong.</h2>";
-                document.getElementById('progressCounter').style.display = 'none';
-                document.getElementById('nextBtn').style.display = 'none';
-                return;
+            if (words.length === 0) return;
+            const currentWord = words[currentIndex];
+
+            // Mặt trước
+            document.getElementById('wordText').innerText = currentWord.word;
+            document.getElementById('phoneticText').innerText = currentWord.phonetic || "";
+            
+            const posLabel = document.getElementById('posLabel');
+            if(currentWord.part_of_speech) {
+                posLabel.innerText = currentWord.part_of_speech;
+                posLabel.classList.remove('hidden');
+            } else {
+                posLabel.classList.add('hidden');
             }
 
-            const currentWord = vocabList[currentIndex];
+            // Mặt sau
+            document.getElementById('meaningText').innerText = currentWord.meaning;
             
-            // Cập nhật mặt trước
-            document.getElementById('word').innerText = currentWord.word;
-            document.getElementById('phonetic').innerText = currentWord.phonetic || '';
-            document.getElementById('pos').innerText = currentWord.part_of_speech || '';
-            
-            // Cập nhật mặt sau
-            document.getElementById('meaning').innerText = currentWord.meaning;
-            document.getElementById('example').innerText = `"${currentWord.example}"`;
-            document.getElementById('translation').innerText = currentWord.example_translation;
+            const exampleBox = document.getElementById('exampleBox');
+            if(currentWord.example) {
+                document.getElementById('exampleText').innerText = `"${currentWord.example}"`;
+                document.getElementById('exampleTransText').innerText = currentWord.example_translation || "";
+                exampleBox.classList.remove('hidden');
+            } else {
+                exampleBox.classList.add('hidden');
+            }
 
-            // Cập nhật bộ đếm
-            document.getElementById('progressCounter').innerText = `Từ ${currentIndex + 1} / ${vocabList.length}`;
-            
-            // Đảm bảo thẻ úp lại khi chuyển sang từ mới
-            isFlipped = false;
-            document.getElementById('flashcard').classList.remove('rotate-y-180');
+            // Cập nhật tiến độ
+            document.getElementById('progressText').innerText = `${currentIndex + 1} / ${words.length}`;
+            document.getElementById('progressBar').style.width = `${((currentIndex + 1) / words.length) * 100}%`;
+
+            // Reset trạng thái lật thẻ khi sang từ mới
+            if (isFlipped) flipCard();
         }
 
-        // 3. Logic Lật thẻ
         function flipCard() {
-            const card = document.getElementById('flashcard');
+            if (words.length === 0) return;
             isFlipped = !isFlipped;
-            if(isFlipped) card.classList.add('rotate-y-180');
-            else card.classList.remove('rotate-y-180');
-        }
-
-        // 4. Logic Phát âm qua Free API
-        async function playAudio(event) {
-            event.stopPropagation(); // Ngăn lật thẻ khi bấm loa
-            const wordToPlay = vocabList[currentIndex].word;
-            try {
-                const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${wordToPlay}`);
-                const data = await response.json();
-                const audioUrl = data[0].phonetics.find(p => p.audio).audio;
-                
-                if(audioUrl) {
-                    new Audio(audioUrl).play();
-                } else {
-                    alert('Không tìm thấy file ghi âm cho từ này.');
-                }
-            } catch (error) {
-                console.error("Lỗi âm thanh:", error);
-            }
-        }
-
-        // 5. Logic Đã thuộc (Gửi API lưu tiến độ)
-        async function markLearned(event) {
-            event.stopPropagation(); // Ngăn lật thẻ lại
-            const currentWord = vocabList[currentIndex];
+            const front = document.getElementById('card-front');
+            const back = document.getElementById('card-back');
             
-            try {
-                await fetch('https://vocab-api-9689.onrender.com/api/progress/update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        user_id: 1,
-                        vocab_id: currentWord.id,
-                        is_learned: true
-                    })
-                });
-                // Chuyển sang từ tiếp theo
-                nextCard();
-            } catch (error) {
-                alert("Lỗi lưu tiến độ!");
+            if (isFlipped) {
+                front.classList.add('rotate-y-180');
+                back.classList.remove('rotate-y-180');
+            } else {
+                front.classList.remove('rotate-y-180');
+                back.classList.add('rotate-y-180');
             }
         }
 
-        // 6. Logic Bỏ qua / Chuyển từ
         function nextCard() {
-            currentIndex++;
-            renderCard();
+            if (currentIndex < words.length - 1) {
+                currentIndex++;
+                renderCard();
+            } else {
+                alert("Chúc mừng! Bạn đã hoàn thành bộ từ vựng này.");
+                window.location.href = "index.html"; // Lệnh tự động chuyển hướng về trang chủ
+            }
         }
+
+        function prevCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderCard();
+            }
+        }
+
+        // Chạy hàm khởi tạo khi load trang
+        document.addEventListener("DOMContentLoaded", init);
     </script>
 </body>
 </html>
