@@ -60,7 +60,7 @@
         // 1. Gọi API lấy dữ liệu
         async function fetchVocab() {
             try {
-                const response = await fetch('http://localhost:8000/api/sets/1/flashcards?user_id=1');
+                const response = await fetch('https://vocab-api-9689.onrender.com/api/sets/1/flashcards?user_id=1');
                 const data = await response.json();
                 
                 vocabList = data.words;
@@ -142,7 +142,7 @@
             const currentWord = vocabList[currentIndex];
             
             try {
-                await fetch('http://localhost:8000/api/progress/update', {
+                await fetch('https://vocab-api-9689.onrender.com/api/progress/update', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
