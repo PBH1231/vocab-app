@@ -24,22 +24,29 @@
 
     <main class="flex-1 flex flex-col items-center justify-center p-4 w-full max-w-md mx-auto">
         
-        <div class="w-full flex justify-between text-sm font-bold mb-4 px-2">
+        <div id="progress-section" class="w-full flex justify-between text-sm font-bold mb-4 px-2">
             <div class="text-orange-500"><i class="fa-solid fa-brain"></i> Chưa thuộc: <span id="notLearnedCount">0</span></div>
             <div class="text-gray-400" id="progressText">0 / 0</div>
             <div class="text-green-500"><i class="fa-solid fa-check-circle"></i> Đã thuộc: <span id="learnedCount">0</span></div>
         </div>
-        <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+        <div id="progress-bar-container" class="w-full bg-gray-200 rounded-full h-2 mb-8">
             <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
         </div>
 
-        <h2 id="wordText" class="text-4xl font-extrabold text-gray-800 mb-2">Đang tải...</h2>
-        <div class="flex items-center justify-center gap-3 mb-2">
-            <p id="phoneticText" class="text-gray-400 font-medium tracking-wide"></p>
-            <button onclick="playAudio(event)" id="audioBtn" class="w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:scale-110 transition shadow-sm hidden" title="Nghe phát âm">
-                <i class="fa-solid fa-volume-high"></i>
-            </button>
-        </div>
+        <div id="flashcard-container" class="w-full perspective-1000 cursor-pointer h-80 relative" onclick="flipCard()">
+            <div id="card-front" class="absolute w-full h-full bg-white rounded-3xl shadow-lg border border-gray-100 flex flex-col items-center justify-center p-6 text-center transform-style-3d backface-hidden card-transition">
+                <span id="posLabel" class="absolute top-4 right-4 px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold uppercase rounded-lg hidden"></span>
+                <h2 id="wordText" class="text-4xl font-extrabold text-gray-800 mb-2">Đang tải...</h2>
+                
+                <div class="flex items-center justify-center gap-3 mb-2">
+                    <p id="phoneticText" class="text-gray-400 font-medium tracking-wide"></p>
+                    <button onclick="playAudio(event)" id="audioBtn" class="w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:scale-110 transition shadow-sm hidden" title="Nghe phát âm">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                </div>
+
+                <div class="absolute bottom-6 text-gray-300 text-sm flex items-center gap-2"><i class="fa-solid fa-hand-pointer"></i> Nhấn để xem nghĩa</div>
+            </div>
 
             <div id="card-back" class="absolute w-full h-full bg-blue-600 rounded-3xl shadow-lg flex flex-col items-center justify-center p-6 text-center transform-style-3d backface-hidden rotate-y-180 card-transition text-white">
                 <h2 id="meaningText" class="text-2xl font-bold mb-4"></h2>
@@ -50,7 +57,7 @@
             </div>
         </div>
 
-        <div class="flex gap-4 w-full mt-10">
+        <div id="action-buttons" class="flex gap-4 w-full mt-10">
             <button onclick="markWord(false)" class="flex-1 bg-white border-2 border-orange-200 text-orange-500 font-bold py-4 rounded-2xl hover:bg-orange-50 transition shadow-sm">
                 <i class="fa-solid fa-xmark mr-2"></i> Chưa thuộc
             </button>
@@ -69,11 +76,10 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const setId = urlParams.get('set_id') || 1;
-        const mode = urlParams.get('mode') || 'all'; // Đọc xem đang học chế độ nào
+        const mode = urlParams.get('mode') || 'all';
 
         async function init() {
             try {
-                // Tự động chuyển đổi link API dựa trên chế độ học
                 let apiUrl = `https://vocab-api-9689.onrender.com/api/sets/${setId}/flashcards?user_id=1`;
                 if (mode === 'unlearned') {
                     apiUrl = `https://vocab-api-9689.onrender.com/api/sets/${setId}/unlearned?user_id=1`;
@@ -88,12 +94,32 @@
                 if (words && words.length > 0) {
                     renderCard();
                 } else {
-                    document.getElementById('wordText').innerText = "Hoàn thành!";
-                    document.getElementById('phoneticText').innerText = "Bạn đã thuộc hết các từ trong bộ này.";
-                    document.getElementById('audioBtn').classList.add('hidden');
+                    // XỬ LÝ GIAO DIỆN KHI TRỐNG (HOÀN THÀNH)
+                    // 1. Ẩn thanh tiến độ và các nút đánh giá
+                    document.getElementById('progress-section').classList.add('hidden');
+                    document.getElementById('progress-bar-container').classList.add('hidden');
+                    document.getElementById('action-buttons').classList.add('hidden');
+                    
+                    // 2. Vô hiệu hóa tính năng click lật thẻ
+                    const container = document.getElementById('flashcard-container');
+                    container.onclick = null; 
+                    
+                    // 3. Đổ giao diện chúc mừng tuyệt đẹp vào khung thẻ bài
+                    container.innerHTML = `
+                        <div class="absolute w-full h-full bg-white rounded-3xl shadow-lg border border-green-100 flex flex-col items-center justify-center p-8 text-center z-10">
+                            <div class="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-4xl mb-6 shadow-inner">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                            <h2 class="text-3xl font-extrabold text-gray-800 mb-3">Tuyệt vời!</h2>
+                            <p class="text-gray-500 font-medium mb-8">Bạn đã hoàn thành mục tiêu ôn tập của bộ từ vựng này.</p>
+                            <a href="index.html" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-blue-700 transition w-full">
+                                Về Trang Chủ
+                            </a>
+                        </div>
+                    `;
                 }
             } catch (error) { 
-                document.getElementById('wordText').innerText = "Lỗi mạng!"; 
+                document.getElementById('wordText').innerText = "Lỗi kết nối!"; 
             }
         }
 
@@ -103,7 +129,8 @@
 
             document.getElementById('wordText').innerText = currentWord.word;
             document.getElementById('phoneticText').innerText = currentWord.phonetic || "";
-            
+            document.getElementById('audioBtn').classList.remove('hidden');
+
             const posLabel = document.getElementById('posLabel');
             if(currentWord.part_of_speech) {
                 posLabel.innerText = currentWord.part_of_speech;
@@ -137,33 +164,50 @@
             }
         }
 
-        // HÀM MỚI: Gửi API lưu tiến độ và chuyển bài
+        async function playAudio(event) {
+            event.stopPropagation(); 
+            const btn = document.getElementById('audioBtn');
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; 
+            
+            const currentWord = words[currentIndex].word;
+            try {
+                const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${currentWord}`);
+                if (!res.ok) throw new Error("Không tìm thấy");
+                const data = await res.json();
+                let audioUrl = '';
+                if (data && data[0] && data[0].phonetics) {
+                    const phoneticObj = data[0].phonetics.find(p => p.audio && p.audio.length > 0);
+                    if (phoneticObj) audioUrl = phoneticObj.audio;
+                }
+                if (audioUrl) {
+                    new Audio(audioUrl).play();
+                } else alert("Chưa có file ghi âm cho từ này.");
+            } catch (err) { alert("Lỗi tải âm thanh."); } 
+            finally { btn.innerHTML = originalIcon; }
+        }
+
         async function markWord(isLearned) {
             if (words.length === 0) return;
             const currentWord = words[currentIndex];
 
-            // Cập nhật số đếm trên màn hình ngay lập tức
             if (isLearned) {
-                countLearned++;
-                document.getElementById('learnedCount').innerText = countLearned;
+                countLearned++; document.getElementById('learnedCount').innerText = countLearned;
             } else {
-                countNotLearned++;
-                document.getElementById('notLearnedCount').innerText = countNotLearned;
+                countNotLearned++; document.getElementById('notLearnedCount').innerText = countNotLearned;
             }
 
-            // Gửi dữ liệu về Backend chạy ngầm
             fetch('https://vocab-api-9689.onrender.com/api/progress/update', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ user_id: 1, vocab_id: currentWord.id, is_learned: isLearned })
-            }).catch(e => console.log("Lỗi lưu tiến độ:", e));
+            }).catch(e => console.log(e));
 
-            // Chuyển thẻ tiếp theo
             if (currentIndex < words.length - 1) {
                 currentIndex++;
                 renderCard();
             } else {
-                alert(`Tuyệt vời! Bạn đã học xong ${words.length} từ.\n- Đã thuộc: ${countLearned}\n- Cần ôn thêm: ${countNotLearned}`);
+                alert(`Tuyệt vời! Bạn đã hoàn thành ${words.length} từ.\n- Thuộc: ${countLearned}\n- Cần ôn: ${countNotLearned}`);
                 window.location.href = "index.html";
             }
         }
