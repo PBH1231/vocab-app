@@ -82,3 +82,11 @@ def create_word(data: VocabCreate, db: Session = Depends(get_db)):
     db.add(new_vocab)
     db.commit()
     return {"message": "Đã thêm từ vựng thành công!"}
+
+# --- API Lấy danh sách Bộ từ vựng ---
+@app.get("/api/sets")
+def get_all_sets(db: Session = Depends(get_db)):
+    """API lấy tất cả các bộ từ vựng từ Database"""
+    # Lưu ý: Class VocabularySet là tên model Database của bạn (có thể là VocabSet tùy bạn đã đặt)
+    sets = db.query(VocabularySet).all()
+    return sets
