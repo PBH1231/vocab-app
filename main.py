@@ -56,3 +56,29 @@ def update_progress(data: ProgressUpdate, db: Session = Depends(get_db)):
         "status": "success", 
         "message": f"Đã lưu trạng thái (Thuộc: {data.is_learned}) cho từ vựng ID {data.vocab_id}"
     }
+# --- Khai báo cấu trúc dữ liệu từ vựng gửi lên ---
+class VocabCreate(BaseModel):
+    set_id: int
+    word: str
+    phonetic: str = ""
+    part_of_speech: str = ""
+    meaning: str
+    example: str = ""
+    example_translation: str = ""
+
+# --- API thêm từ vựng mới ---
+@app.post("/api/words")
+def create_word(data: VocabCreate, db: Session = Depends(get_db)):
+    """API lưu từ vựng mới vào Supabase"""
+    new_vocab = Vocabulary(
+        set_id=data.set_id,
+        word=data.word,
+        phonetic=data.phonetic,
+        part_of_speech=data.part_of_speech,
+        meaning=data.meaning,
+        example=data.example,
+        example_translation=data.example_translation
+    )
+    db.add(new_vocab)
+    db.commit()
+    return {"message": "Đã thêm từ vựng thành công!"}
