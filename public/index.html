@@ -271,16 +271,19 @@
                                 <p class="text-sm text-gray-500 mb-4 line-clamp-2">${vocabSet.description || 'Không có mô tả'}</p>
                             </div>
                             <div class="flex gap-2 mt-2 pt-4 border-t border-gray-50">
-                                 <a href="learn.html?set_id=${vocabSet.id}" class="flex-1 text-center bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-100 transition shadow-sm">
-                                     <i class="fa-solid fa-bolt mr-1"></i> Ôn tập
+                                 <a href="learn.html?set_id=${vocabSet.id}" class="flex-1 text-center bg-blue-50 text-blue-600 px-3 py-2 rounded-xl font-bold text-sm hover:bg-blue-100 transition shadow-sm" title="Học tất cả">
+                                     <i class="fa-solid fa-bolt"></i>
                                  </a>
-                                 <button onclick="viewWordList(${vocabSet.id}, '${vocabSet.title}')" class="px-4 py-2 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100 transition" title="Xem danh sách">
+                                 <a href="learn.html?set_id=${vocabSet.id}&mode=unlearned" class="flex-1 text-center bg-orange-50 text-orange-600 px-3 py-2 rounded-xl font-bold text-sm hover:bg-orange-100 transition shadow-sm" title="Ôn từ chưa thuộc">
+                                     <i class="fa-solid fa-brain"></i>
+                                 </a>
+                                 <button onclick="viewWordList(${vocabSet.id}, '${vocabSet.title}')" class="px-3 py-2 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100 transition" title="Xem danh sách">
                                      <i class="fa-solid fa-list"></i>
                                  </button>
-                                 <button onclick="editSet(${vocabSet.id}, '${vocabSet.title}', '${vocabSet.description}')" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition">
+                                 <button onclick="editSet(${vocabSet.id}, '${vocabSet.title}', '${vocabSet.description}')" class="px-3 py-2 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition" title="Sửa">
                                      <i class="fa-solid fa-pen"></i>
                                  </button>
-                                 <button onclick="deleteSet(${vocabSet.id})" class="px-4 py-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition">
+                                 <button onclick="deleteSet(${vocabSet.id})" class="px-3 py-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition" title="Xóa">
                                      <i class="fa-solid fa-trash"></i>
                                  </button>
                              </div>

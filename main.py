@@ -301,3 +301,34 @@ def get_progress_stats(user_id: int = 1, db: Session = Depends(get_db)):
         "learned_words": learned_words,
         "need_review": need_review
     }
+
+# =========================
+# API: ÔN TẬP TỪ CHƯA THUỘC
+# =========================
+
+@app.get("/api/sets/{set_id}/unlearned")
+def get_unlearned_flashcards(set_id: int, user_id: int = 1, db: Session = Depends(get_db)):
+    vocab_set = db.query(VocabularySet).filter(VocabularySet.id == set_id).first()
+    if not vocab_set:
+        raise HTTPException(status_code=404, detail="Không tìm thấy bộ từ")
+
+    # Lấy tất cả từ trong bộ
+    words = db.query(Vocabulary).filter(Vocabulary.set_id == set_id).all()
+    
+    # Tìm các từ người dùng ĐÃ đánh dấu là "Đã thuộc"
+    learned_progress = db.query(UserProgress).filter(
+        UserProgress.user_id == user_id,
+        UserProgress.vocab_id.in_([w.id for w in words]),
+        UserProgress.is_learned == True
+    ).all()
+    learned_ids = [p.vocab_id for p in learned_progress]
+    
+    # Lọc ra những từ CHƯA THUỘC (tức là không nằm trong danh sách Đã thuộc)
+    unlearned_words = [w for w in words if w.id not in learned_ids]
+    
+    return {
+        "set_id": set_id,
+        "set_title": vocab_set.title + " (Chỉ ôn từ chưa thuộc)",
+        "total_words": len(unlearned_words),
+        "words": unlearned_words
+    }
