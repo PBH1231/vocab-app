@@ -108,8 +108,8 @@
         </div>
     </div>
 
-    <div id="addWordModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden">
+    <div id="addWordModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[80] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b border-gray-100 flex justify-between items-center">
                 <h3 id="wordModalTitle" class="text-xl font-bold text-gray-800">Thêm Từ Mới</h3>
                 <button onclick="toggleWordModal(false)" class="text-gray-400 hover:text-red-500 transition text-2xl">&times;</button>
@@ -158,7 +158,7 @@
         </div>
     </div>
 
-    <div id="viewListModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+    <div id="viewListModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[40] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
         <div class="bg-white rounded-3xl shadow-2xl max-w-5xl w-full max-h-[85vh] flex flex-col overflow-hidden">
             <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row md:justify-between md:items-center gap-4 bg-gray-50">
                 <div>
@@ -354,6 +354,11 @@
                                  <a href="learn.html?set_id=${vocabSet.id}&mode=unlearned" class="flex-1 text-center bg-orange-50 text-orange-600 px-3 py-2 rounded-xl font-bold text-sm hover:bg-orange-100 transition shadow-sm" title="Ôn từ chưa thuộc">
                                      <i class="fa-solid fa-brain"></i>
                                  </a>
+                                 <a href="match.html?set_id=${vocabSet.id}" 
+                                    class="flex-1 text-center bg-emerald-50 text-emerald-600 px-3 py-2 rounded-xl font-bold text-sm hover:bg-emerald-100 transition shadow-sm" 
+                                    title="Ghép thẻ">
+                                        <i class="fa-solid fa-clone"></i>
+                                </a>
                                  <button onclick="viewWordList(${vocabSet.id})" class="px-3 py-2 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100 transition" title="Xem/Sửa/Xóa từ">
                                      <i class="fa-solid fa-list"></i>
                                  </button>

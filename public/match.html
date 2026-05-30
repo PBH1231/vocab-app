@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ghép thẻ từ vựng</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <a href="index.html" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-blue-600 transition">
+          <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <div class="min-w-0">
+          <h1 class="text-xl font-extrabold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-clone text-blue-600"></i>
+            Ghép thẻ
+          </h1>
+          <p id="setTitle" class="text-sm text-slate-500 truncate">Đang tải bộ từ vựng...</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="toggleSound()" id="soundBtn" class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition" title="Bật/tắt âm thanh">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+        <button onclick="startGame()" class="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition shadow-sm">
+          <i class="fa-solid fa-rotate-right mr-2"></i>Chơi lại
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto p-4 md:p-6">
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+        <div class="text-xs uppercase font-bold text-slate-400">Tiến độ</div>
+        <div class="text-2xl font-extrabold mt-1"><span id="matchedCount">0</span>/<span id="totalPairs">0</span></div>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+        <div class="text-xs uppercase font-bold text-slate-400">Lượt chọn</div>
+        <div id="moveCount" class="text-2xl font-extrabold mt-1">0</div>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+        <div class="text-xs uppercase font-bold text-slate-400">Thời gian</div>
+        <div id="timerText" class="text-2xl font-extrabold mt-1">00:00</div>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+        <div class="text-xs uppercase font-bold text-slate-400">Chế độ</div>
+        <div id="modeText" class="text-lg font-extrabold mt-2 text-blue-600">Từ - Nghĩa</div>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-3xl border border-slate-100 shadow-sm p-4 md:p-6 mb-5">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+        <div>
+          <h2 class="text-lg font-extrabold text-slate-800">Chọn 2 thẻ khớp nhau</h2>
+          <p class="text-sm text-slate-500">Ghép từ tiếng Anh với nghĩa tiếng Việt. Mỗi lượt hiển thị tối đa 6 cặp từ.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="changePairCount(4)" class="pair-btn px-3 py-2 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200">4 cặp</button>
+          <button onclick="changePairCount(6)" class="pair-btn px-3 py-2 rounded-xl bg-blue-100 text-blue-700 font-bold text-sm hover:bg-blue-200">6 cặp</button>
+          <button onclick="changePairCount(8)" class="pair-btn px-3 py-2 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200">8 cặp</button>
+        </div>
+      </div>
+
+      <div id="gameBoard" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 min-h-[360px]"></div>
+    </section>
+  </main>
+
+  <div id="completeModal" class="fixed inset-0 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm z-50 p-4">
+    <div class="bg-white rounded-[2rem] max-w-md w-full overflow-hidden shadow-2xl">
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center px-8 py-8">
+        <div class="w-20 h-20 rounded-full bg-white/15 border border-white/20 mx-auto flex items-center justify-center text-4xl mb-4">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h2 class="text-3xl font-extrabold">Hoàn thành! 🎉</h2>
+        <p class="text-blue-100 mt-2">Bạn đã ghép đúng toàn bộ thẻ.</p>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-slate-50 rounded-2xl p-4 text-center">
+            <div class="text-xs font-bold uppercase text-slate-400">Thời gian</div>
+            <div id="finalTime" class="text-2xl font-extrabold mt-1">00:00</div>
+          </div>
+          <div class="bg-slate-50 rounded-2xl p-4 text-center">
+            <div class="text-xs font-bold uppercase text-slate-400">Lượt chọn</div>
+            <div id="finalMoves" class="text-2xl font-extrabold mt-1">0</div>
+          </div>
+        </div>
+        <button onclick="closeCompleteModal(); startGame();" class="w-full bg-blue-600 text-white font-bold py-3 rounded-2xl hover:bg-blue-700 transition">
+          <i class="fa-solid fa-rotate-right mr-2"></i>Chơi lại
+        </button>
+        <a href="index.html" class="block text-center w-full bg-slate-100 text-slate-700 font-bold py-3 rounded-2xl hover:bg-slate-200 transition">
+          <i class="fa-solid fa-house mr-2"></i>Về trang chủ
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = ["localhost", "127.0.0.1"].includes(window.location.hostname)
+      ? "http://127.0.0.1:8000"
+      : "https://vocab-api-9689.onrender.com";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const setId = urlParams.get("set_id") || 1;
+
+    let allWords = [];
+    let cards = [];
+    let selectedCards = [];
+    let lockBoard = false;
+    let matchedPairs = 0;
+    let moves = 0;
+    let pairCount = 6;
+    let startedAt = null;
+    let timerInterval = null;
+    let soundOn = true;
+
+    document.addEventListener("DOMContentLoaded", loadWords);
+
+    async function loadWords() {
+      try {
+        const res = await fetch(`${API_BASE}/api/sets/${setId}/flashcards?user_id=1`);
+        if (!res.ok) throw new Error("Không tải được dữ liệu");
+        const data = await res.json();
+        document.getElementById("setTitle").innerText = data.set_title || "Bộ từ vựng";
+        allWords = (data.words || []).filter(w => w.word && w.meaning);
+
+        if (allWords.length < 2) {
+          document.getElementById("gameBoard").innerHTML = `
+            <div class="col-span-full bg-orange-50 border border-orange-100 text-orange-700 rounded-2xl p-6 text-center font-bold">
+              Cần ít nhất 2 từ có đủ nghĩa để chơi ghép thẻ.
+            </div>`;
+          return;
+        }
+
+        startGame();
+      } catch (error) {
+        document.getElementById("gameBoard").innerHTML = `
+          <div class="col-span-full bg-red-50 border border-red-100 text-red-600 rounded-2xl p-6 text-center font-bold">
+            Lỗi kết nối dữ liệu. Hãy kiểm tra backend/API.
+          </div>`;
+      }
+    }
+
+    function startGame() {
+      closeCompleteModal();
+      selectedCards = [];
+      lockBoard = false;
+      matchedPairs = 0;
+      moves = 0;
+      startedAt = Date.now();
+      document.getElementById("moveCount").innerText = moves;
+      document.getElementById("matchedCount").innerText = matchedPairs;
+
+      const availablePairs = Math.min(pairCount, allWords.length);
+      document.getElementById("totalPairs").innerText = availablePairs;
+      document.getElementById("modeText").innerText = "Từ - Nghĩa";
+
+      const pickedWords = shuffleArray([...allWords]).slice(0, availablePairs);
+      cards = [];
+
+      pickedWords.forEach(word => {
+        cards.push({
+          id: `${word.id}-word`,
+          pairId: word.id,
+          type: "word",
+          text: word.word,
+          subText: word.part_of_speech ? word.part_of_speech.toUpperCase() : "TỪ",
+          matched: false
+        });
+        cards.push({
+          id: `${word.id}-meaning`,
+          pairId: word.id,
+          type: "meaning",
+          text: word.meaning,
+          subText: "NGHĨA",
+          matched: false
+        });
+      });
+
+      cards = shuffleArray(cards);
+      renderBoard();
+      startTimer();
+    }
+
+    function renderBoard() {
+      const board = document.getElementById("gameBoard");
+      board.innerHTML = "";
+      cards.forEach(card => {
+        const cardEl = document.createElement("button");
+        cardEl.id = card.id;
+        cardEl.onclick = () => selectCard(card.id);
+        cardEl.className = "match-card min-h-[130px] md:min-h-[145px] rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition p-4 text-center flex flex-col items-center justify-center gap-2";
+        cardEl.innerHTML = `
+          <span class="text-[10px] font-extrabold px-2 py-1 rounded-lg ${card.type === "word" ? "bg-blue-50 text-blue-600" : "bg-emerald-50 text-emerald-600"}">${escapeHtml(card.subText)}</span>
+          <span class="text-lg md:text-xl font-bold leading-snug text-slate-800">${escapeHtml(card.text)}</span>
+        `;
+        board.appendChild(cardEl);
+      });
+    }
+
+    function selectCard(cardId) {
+      if (lockBoard) return;
+      const card = cards.find(c => c.id === cardId);
+      const cardEl = document.getElementById(cardId);
+      if (!card || card.matched || selectedCards.some(c => c.id === cardId)) return;
+
+      selectedCards.push(card);
+      cardEl.classList.remove("bg-white", "border-slate-200");
+      cardEl.classList.add("bg-blue-50", "border-blue-400", "ring-2", "ring-blue-100");
+
+      if (selectedCards.length === 2) {
+        moves++;
+        document.getElementById("moveCount").innerText = moves;
+        lockBoard = true;
+        const [first, second] = selectedCards;
+
+        if (first.pairId === second.pairId && first.type !== second.type) {
+          setTimeout(() => handleCorrect(first, second), 250);
+        } else {
+          setTimeout(() => handleWrong(first, second), 650);
+        }
+      }
+    }
+
+    function handleCorrect(first, second) {
+      playBeep(880, 0.08);
+      [first, second].forEach(card => {
+        card.matched = true;
+        const el = document.getElementById(card.id);
+        el.className = "min-h-[130px] md:min-h-[145px] rounded-2xl border border-green-200 bg-green-50 shadow-sm p-4 text-center flex flex-col items-center justify-center gap-2 opacity-70 pointer-events-none";
+        el.innerHTML += `<i class="fa-solid fa-check text-green-500 text-xl"></i>`;
+      });
+
+      matchedPairs++;
+      document.getElementById("matchedCount").innerText = matchedPairs;
+      selectedCards = [];
+      lockBoard = false;
+
+      if (matchedPairs === Number(document.getElementById("totalPairs").innerText)) {
+        finishGame();
+      }
+    }
+
+    function handleWrong(first, second) {
+      playBeep(220, 0.08);
+      [first, second].forEach(card => {
+        const el = document.getElementById(card.id);
+        el.classList.remove("bg-blue-50", "border-blue-400", "ring-2", "ring-blue-100");
+        el.classList.add("bg-white", "border-slate-200");
+      });
+      selectedCards = [];
+      lockBoard = false;
+    }
+
+    function finishGame() {
+      clearInterval(timerInterval);
+      document.getElementById("finalTime").innerText = document.getElementById("timerText").innerText;
+      document.getElementById("finalMoves").innerText = moves;
+      document.getElementById("completeModal").classList.remove("hidden");
+      document.getElementById("completeModal").classList.add("flex");
+    }
+
+    function closeCompleteModal() {
+      const modal = document.getElementById("completeModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      updateTimer();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+      if (!startedAt) return;
+      const seconds = Math.floor((Date.now() - startedAt) / 1000);
+      const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
+      const ss = String(seconds % 60).padStart(2, "0");
+      document.getElementById("timerText").innerText = `${mm}:${ss}`;
+    }
+
+    function changePairCount(count) {
+      pairCount = count;
+      document.querySelectorAll(".pair-btn").forEach(btn => {
+        btn.className = "pair-btn px-3 py-2 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200";
+      });
+      event.target.className = "pair-btn px-3 py-2 rounded-xl bg-blue-100 text-blue-700 font-bold text-sm hover:bg-blue-200";
+      startGame();
+    }
+
+    function toggleSound() {
+      soundOn = !soundOn;
+      document.getElementById("soundBtn").innerHTML = soundOn
+        ? '<i class="fa-solid fa-volume-high"></i>'
+        : '<i class="fa-solid fa-volume-xmark"></i>';
+    }
+
+    function playBeep(freq, duration) {
+      if (!soundOn) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+        oscillator.connect(gain);
+        gain.connect(ctx.destination);
+        oscillator.frequency.value = freq;
+        oscillator.type = "sine";
+        gain.gain.value = 0.04;
+        oscillator.start();
+        setTimeout(() => {
+          oscillator.stop();
+          ctx.close();
+        }, duration * 1000);
+      } catch (err) {}
+    }
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
