@@ -19,7 +19,9 @@
     <header class="bg-white p-4 shadow-sm flex items-center justify-between sticky top-0 z-10">
         <a href="index.html" class="text-gray-500 hover:text-blue-600 transition p-2"><i class="fa-solid fa-arrow-left text-xl"></i></a>
         <h1 id="setHeader" class="font-bold text-lg text-gray-700 truncate px-4">Đang tải...</h1>
-        <div class="w-8"></div>
+        <button onclick="shuffleRemainingWords(event)" id="shuffleHeaderBtn" class="text-blue-600 hover:text-blue-700 transition p-2 rounded-xl hover:bg-blue-50" title="Trộn thẻ ngẫu nhiên">
+            <i class="fa-solid fa-shuffle text-xl"></i>
+        </button>
     </header>
 
     <main class="flex-1 flex flex-col items-center justify-center p-4 w-full max-w-md mx-auto">
@@ -29,8 +31,14 @@
             <div class="text-gray-400" id="progressText">0 / 0</div>
             <div class="text-green-500"><i class="fa-solid fa-check-circle"></i> Đã thuộc: <span id="learnedCount">0</span></div>
         </div>
-        <div id="progress-bar-container" class="w-full bg-gray-200 rounded-full h-2 mb-8">
+        <div id="progress-bar-container" class="w-full bg-gray-200 rounded-full h-2 mb-4">
             <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+
+        <div id="shuffle-section" class="w-full mb-8 flex justify-center">
+            <button onclick="shuffleRemainingWords(event)" id="shuffleBtn" class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-bold text-sm hover:bg-indigo-100 transition shadow-sm border border-indigo-100">
+                <i class="fa-solid fa-shuffle mr-2"></i> Trộn thẻ ngẫu nhiên
+            </button>
         </div>
 
         <div id="flashcard-container" class="w-full perspective-1000 cursor-pointer h-80 relative" onclick="flipCard()">
@@ -74,22 +82,32 @@
         let countLearned = 0;
         let countNotLearned = 0;
 
+        const API_BASE = ["localhost", "127.0.0.1"].includes(window.location.hostname)
+            ? "http://127.0.0.1:8000"
+            : "https://vocab-api-9689.onrender.com";
+
         const urlParams = new URLSearchParams(window.location.search);
         const setId = urlParams.get('set_id') || 1;
         const mode = urlParams.get('mode') || 'all';
+        const shouldShuffleOnLoad = urlParams.get('shuffle') === '1';
 
         async function init() {
             try {
-                let apiUrl = `https://vocab-api-9689.onrender.com/api/sets/${setId}/flashcards?user_id=1`;
+                let apiUrl = `${API_BASE}/api/sets/${setId}/flashcards?user_id=1`;
                 if (mode === 'unlearned') {
-                    apiUrl = `https://vocab-api-9689.onrender.com/api/sets/${setId}/unlearned?user_id=1`;
+                    apiUrl = `${API_BASE}/api/sets/${setId}/unlearned?user_id=1`;
                 }
 
                 const res = await fetch(apiUrl);
                 const data = await res.json();
                 
                 document.getElementById('setHeader').innerText = data.set_title || "Bộ Từ Vựng";
-                words = data.words;
+                words = data.words || [];
+
+                if (shouldShuffleOnLoad && words.length > 1) {
+                    shuffleArray(words);
+                    showShuffleToast("Đã tự động trộn thẻ khi bắt đầu học.");
+                }
 
                 if (words && words.length > 0) {
                     renderCard();
@@ -98,6 +116,8 @@
                     // 1. Ẩn thanh tiến độ và các nút đánh giá
                     document.getElementById('progress-section').classList.add('hidden');
                     document.getElementById('progress-bar-container').classList.add('hidden');
+                    document.getElementById('shuffle-section').classList.add('hidden');
+                    document.getElementById('shuffleHeaderBtn').classList.add('hidden');
                     document.getElementById('action-buttons').classList.add('hidden');
                     
                     // 2. Vô hiệu hóa tính năng click lật thẻ
@@ -121,6 +141,60 @@
             } catch (error) { 
                 document.getElementById('wordText').innerText = "Lỗi kết nối!"; 
             }
+        }
+
+        function shuffleArray(array) {
+            // Fisher-Yates Shuffle: trộn mảng ngẫu nhiên công bằng hơn sort(() => Math.random() - 0.5)
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleRemainingWords(event) {
+            if (event) event.stopPropagation();
+
+            if (!words || words.length <= 1) {
+                showShuffleToast("Cần ít nhất 2 thẻ để trộn.");
+                return;
+            }
+
+            // Chỉ trộn phần thẻ chưa học, giữ nguyên phần đã đi qua để không sai tiến độ.
+            const completedWords = words.slice(0, currentIndex);
+            const remainingWords = words.slice(currentIndex);
+            shuffleArray(remainingWords);
+            words = [...completedWords, ...remainingWords];
+
+            // Nếu đang xem mặt sau thì lật về mặt trước sau khi trộn.
+            if (isFlipped) {
+                isFlipped = false;
+                document.getElementById('card-front').classList.remove('rotate-y-180');
+                document.getElementById('card-back').classList.add('rotate-y-180');
+            }
+
+            renderCard();
+            showShuffleToast("Đã trộn ngẫu nhiên các thẻ còn lại.");
+        }
+
+        function showShuffleToast(message) {
+            let toast = document.getElementById('shuffleToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'shuffleToast';
+                toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-3 rounded-xl text-sm font-bold shadow-lg z-50 transition-opacity duration-300';
+                document.body.appendChild(toast);
+            }
+
+            toast.innerHTML = `<i class="fa-solid fa-shuffle mr-2"></i>${message}`;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+
+            clearTimeout(window.shuffleToastTimer);
+            window.shuffleToastTimer = setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 1800);
         }
 
         function renderCard() {
@@ -197,7 +271,7 @@
                 countNotLearned++; document.getElementById('notLearnedCount').innerText = countNotLearned;
             }
 
-            fetch('https://vocab-api-9689.onrender.com/api/progress/update', {
+            fetch(`${API_BASE}/api/progress/update`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ user_id: 1, vocab_id: currentWord.id, is_learned: isLearned })
