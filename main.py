@@ -36,6 +36,14 @@ def get_db():
 # SCHEMAS
 # =========================
 
+class VocabUpdate(BaseModel):
+    word: str
+    phonetic: str = ""
+    part_of_speech: str = ""
+    meaning: str
+    example: str = ""
+    example_translation: str = ""
+
 class ProgressUpdate(BaseModel):
     user_id: int
     vocab_id: int
@@ -181,6 +189,33 @@ def create_word(data: VocabCreate, db: Session = Depends(get_db)):
         }
     }
 
+@app.put("/api/words/{word_id}")
+def update_word(word_id: int, data: VocabUpdate, db: Session = Depends(get_db)):
+    word = db.query(Vocabulary).filter(Vocabulary.id == word_id).first()
+    if not word:
+        raise HTTPException(status_code=404, detail="Không tìm thấy từ vựng")
+    
+    word.word = data.word
+    word.phonetic = data.phonetic
+    word.part_of_speech = data.part_of_speech
+    word.meaning = data.meaning
+    word.example = data.example
+    word.example_translation = data.example_translation
+    
+    db.commit()
+    return {"message": "Đã cập nhật từ vựng"}
+
+@app.delete("/api/words/{word_id}")
+def delete_word(word_id: int, db: Session = Depends(get_db)):
+    word = db.query(Vocabulary).filter(Vocabulary.id == word_id).first()
+    if not word:
+        raise HTTPException(status_code=404, detail="Không tìm thấy từ vựng")
+    
+    # Xóa tiến độ học của từ này trước khi xóa từ để tránh lỗi Database
+    db.query(UserProgress).filter(UserProgress.vocab_id == word_id).delete()
+    db.delete(word)
+    db.commit()
+    return {"message": "Đã xóa từ vựng"}
 
 # =========================
 # API: USER PROGRESS
@@ -332,3 +367,4 @@ def get_unlearned_flashcards(set_id: int, user_id: int = 1, db: Session = Depend
         "total_words": len(unlearned_words),
         "words": unlearned_words
     }
+
